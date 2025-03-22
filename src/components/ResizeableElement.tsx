@@ -1,4 +1,4 @@
-import { HTMLAttributes, useEffect, useRef, useState } from 'react'
+import { HTMLAttributes, useCallback, useEffect, useRef, useState } from 'react'
 
 export default function ResizeableElement({
   startingWidth = 300,
@@ -20,27 +20,30 @@ export default function ResizeableElement({
     setIsResizing(false)
   }
 
-  const resize = (e: MouseEvent) => {
-    if (isResizing && resizeRef.current) {
-      const width = Math.max(
-        minWidth,
-        e.clientX - resizeRef.current.getBoundingClientRect().left
-      )
+  const resize = useCallback(
+    (e: MouseEvent) => {
+      if (isResizing && resizeRef.current) {
+        const width = Math.max(
+          minWidth,
+          e.clientX - resizeRef.current.getBoundingClientRect().left
+        )
 
-      if (width < snapToZero) {
-        resizeRef.current.style.transitionProperty = 'width'
-        resizeRef.current.style.transitionTimingFunction =
-          'cubic-bezier(0.4, 0, 0.2, 1)'
-        resizeRef.current.style.transitionDuration = '150ms'
-        setWidth(0)
-      } else {
-        resizeRef.current.style.transitionProperty = ''
-        resizeRef.current.style.transitionTimingFunction = ''
-        resizeRef.current.style.transitionDuration = ''
-        setWidth(width)
+        if (width < snapToZero) {
+          resizeRef.current.style.transitionProperty = 'width'
+          resizeRef.current.style.transitionTimingFunction =
+            'cubic-bezier(0.4, 0, 0.2, 1)'
+          resizeRef.current.style.transitionDuration = '300ms'
+          setWidth(0)
+        } else {
+          resizeRef.current.style.transitionProperty = ''
+          resizeRef.current.style.transitionTimingFunction = ''
+          resizeRef.current.style.transitionDuration = ''
+          setWidth(width)
+        }
       }
-    }
-  }
+    },
+    [isResizing, minWidth, snapToZero]
+  )
 
   useEffect(() => {
     document.body.addEventListener('mousemove', resize)
@@ -63,8 +66,8 @@ export default function ResizeableElement({
         maxWidth: `${maxWidth}px`,
       }}
     >
-      {children}
-      <div
+      <div className="overflow-hidden">{children}</div>
+      <button
         className="absolute top-0 right-0 w-4 translate-x-2 h-full cursor-ew-resize"
         onMouseDown={startResizing}
       />
