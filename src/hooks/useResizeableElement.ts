@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 export default function useResizeableElement({
   startingWidth = 300,
@@ -18,17 +18,25 @@ export default function useResizeableElement({
     isResizing.current = false
   }
 
-  const resize = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+  const resize = (e: MouseEvent) => {
     if (isResizing.current) {
       setWidth(Math.max(minWidth, Math.min(e.clientX, maxWidth)))
     }
   }
 
+  useEffect(() => {
+    document.body.addEventListener('mousemove', resize)
+    document.body.addEventListener('mouseup', stopResizing)
+
+    return () => {
+      document.body.removeEventListener('mousemove', resize)
+      document.body.removeEventListener('mouseup', stopResizing)
+    }
+  })
+
   return {
     width,
     startResizing,
-    stopResizing,
-    resize,
   }
 }
 
