@@ -1,0 +1,11 @@
+@import 'tailwindcss';
+
+:root {
+  body {
+    @apply bg-[#1A1C1E];
+  }
+
+  #root {
+    @apply h-dvh w-dvw;
+  }
+}
