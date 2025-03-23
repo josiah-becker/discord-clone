@@ -77,14 +77,25 @@ func postUserHandler(session *gocql.Session) http.HandlerFunc {
 
 		if userRequest.Username == "" {
 			http.Error(w, "Username is required", http.StatusBadRequest)
-		}
-
-		if userRequest.Age <= 0 {
+		} else if userRequest.Age <= 0 {
 			http.Error(w, "Age must be greater than 0", http.StatusBadRequest)
+			return
 		}
 
-		// Print the unmarshalled user data
-		fmt.Println("Received User:", userRequest)
+		// Create a new user
+		user := User{
+			id:       gocql.TimeUUID(),
+			username: userRequest.Username,
+			age:      userRequest.Age,
+		}
+
+		// Insert the user into the database
+		_, err = insertUser(session, user)
+		if err != nil {
+			http.Error(w, "Failed to insert user", http.StatusInternalServerError)
+			return
+		}
+
 	}
 }
 
@@ -126,7 +137,7 @@ func main() {
 
 	// Wait for a signal to terminate the server
 	<-signalChan
-	
+
 	fmt.Println("Gracefully shutting down server...")
 
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)

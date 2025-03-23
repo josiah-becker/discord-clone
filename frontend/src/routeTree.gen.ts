@@ -11,14 +11,34 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as ProtectedImport } from './routes/_protected'
 import { Route as IndexImport } from './routes/index'
+import { Route as LoginIndexImport } from './routes/login/index'
+import { Route as ProtectedDashboardIndexImport } from './routes/_protected/dashboard/index'
 
 // Create/Update Routes
+
+const ProtectedRoute = ProtectedImport.update({
+  id: '/_protected',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRoute,
+} as any)
+
+const LoginIndexRoute = LoginIndexImport.update({
+  id: '/login/',
+  path: '/login/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ProtectedDashboardIndexRoute = ProtectedDashboardIndexImport.update({
+  id: '/dashboard/',
+  path: '/dashboard/',
+  getParentRoute: () => ProtectedRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
@@ -32,39 +52,85 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
+    '/_protected': {
+      id: '/_protected'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof ProtectedImport
+      parentRoute: typeof rootRoute
+    }
+    '/login/': {
+      id: '/login/'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginIndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/_protected/dashboard/': {
+      id: '/_protected/dashboard/'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof ProtectedDashboardIndexImport
+      parentRoute: typeof ProtectedImport
+    }
   }
 }
 
 // Create and export the route tree
 
+interface ProtectedRouteChildren {
+  ProtectedDashboardIndexRoute: typeof ProtectedDashboardIndexRoute
+}
+
+const ProtectedRouteChildren: ProtectedRouteChildren = {
+  ProtectedDashboardIndexRoute: ProtectedDashboardIndexRoute,
+}
+
+const ProtectedRouteWithChildren = ProtectedRoute._addFileChildren(
+  ProtectedRouteChildren,
+)
+
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '': typeof ProtectedRouteWithChildren
+  '/login': typeof LoginIndexRoute
+  '/dashboard': typeof ProtectedDashboardIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '': typeof ProtectedRouteWithChildren
+  '/login': typeof LoginIndexRoute
+  '/dashboard': typeof ProtectedDashboardIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
+  '/_protected': typeof ProtectedRouteWithChildren
+  '/login/': typeof LoginIndexRoute
+  '/_protected/dashboard/': typeof ProtectedDashboardIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '' | '/login' | '/dashboard'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '' | '/login' | '/dashboard'
+  id: '__root__' | '/' | '/_protected' | '/login/' | '/_protected/dashboard/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ProtectedRoute: typeof ProtectedRouteWithChildren
+  LoginIndexRoute: typeof LoginIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ProtectedRoute: ProtectedRouteWithChildren,
+  LoginIndexRoute: LoginIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -77,11 +143,26 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
-        "/"
+        "/",
+        "/_protected",
+        "/login/"
       ]
     },
     "/": {
       "filePath": "index.tsx"
+    },
+    "/_protected": {
+      "filePath": "_protected.ts",
+      "children": [
+        "/_protected/dashboard/"
+      ]
+    },
+    "/login/": {
+      "filePath": "login/index.tsx"
+    },
+    "/_protected/dashboard/": {
+      "filePath": "_protected/dashboard/index.tsx",
+      "parent": "/_protected"
     }
   }
 }
