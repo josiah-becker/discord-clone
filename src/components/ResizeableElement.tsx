@@ -5,6 +5,7 @@ export default function ResizeableElement({
   minWidth = 0,
   maxWidth = document.body.getBoundingClientRect().width,
   snapToZero = 0,
+  onSnapEnd,
   children,
   ...props
 }: ResizeableElementProps) {
@@ -18,6 +19,9 @@ export default function ResizeableElement({
 
   const stopResizing = () => {
     setIsResizing(false)
+    if (width < snapToZero) {
+      onSnapEnd?.()
+    }
   }
 
   const resize = useCallback(
@@ -80,5 +84,6 @@ interface ResizeableElementProps extends HTMLAttributes<HTMLDivElement> {
   minWidth?: number
   maxWidth?: number
   snapToZero?: number
+  onSnapEnd?: () => void
   children?: React.ReactNode
 }
