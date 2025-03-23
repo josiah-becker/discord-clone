@@ -1,5 +1,9 @@
 export function useAuth() {
-  function logIn() {
+  async function logIn() {
+    await fetch('http://localhost:8080/api/login', {
+      method: 'POST',
+      body: JSON.stringify({ username: 'Josiah', password: 'password' }),
+    })
     sessionStorage.setItem('isLoggedIn', 'true')
   }
   function logOut() {
