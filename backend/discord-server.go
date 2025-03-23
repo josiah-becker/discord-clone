@@ -9,11 +9,11 @@ import (
 
 func main() {
 	// Create a Cassandra cluster configuration
-	cluster := gocql.NewCluster("localhost:9042") // Default port is 9042, not 9000
-	cluster.Keyspace = "discordclone"             // Replace with your actual keyspace
+	cluster := gocql.NewCluster("localhost:9042")
+	cluster.Keyspace = "discordclone"
 	cluster.Consistency = gocql.Quorum
 
-	// Create session
+	// Create session Cassandra
 	session, err := cluster.CreateSession()
 	if err != nil {
 		log.Fatal("Failed to connect to Cassandra:", err)
