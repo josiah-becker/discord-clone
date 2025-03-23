@@ -2,7 +2,11 @@ module discord-server
 
 go 1.23.3
 
-require github.com/gocql/gocql v1.7.0
+require (
+	github.com/go-chi/chi/v5 v5.2.1
+	github.com/gocql/gocql v1.7.0
+	github.com/rs/cors v1.11.1
+)
 
 require (
 	github.com/golang/snappy v0.0.3 // indirect

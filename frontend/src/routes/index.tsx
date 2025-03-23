@@ -1,3 +1,4 @@
+import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import clsx from 'clsx'
 import { useState } from 'react'
@@ -43,6 +44,19 @@ const MockServers = [
 ]
 
 function Index() {
+  const { data } = useSuspenseQuery(
+    queryOptions({
+      queryKey: ['test'],
+      queryFn: async () => {
+        const res = await fetch('http://localhost:8080/api/users')
+        const jsonData = await res.json()
+        return jsonData
+      },
+    })
+  )
+
+  console.log('++ ', data)
+
   const [showSidebar, setShowSidebar] = useState(true)
   return (
     <div className="h-full flex overflow-auto p-4">
@@ -96,7 +110,19 @@ function Index() {
             <ArrowUpTray className="w-6 rotate-90 cursor-pointer" />
           </button>
         </header>
-        <div className="h-full min-w-96 gap-12 bg-[#25262B] rounded-lg flex"></div>
+        <div className="h-full min-w-96 gap-12 p-8 bg-[#25262B] rounded-lg flex">
+          <button
+            onClick={async () => {
+              await fetch('http://localhost:8080/api/user', {
+                method: 'POST',
+                body: JSON.stringify({ username: 'jimbo', age: 23 }),
+              })
+            }}
+            className="bg-[#1A1C1E] size-20 text-white/80"
+          >
+            Add user
+          </button>
+        </div>
       </div>
     </div>
   )
