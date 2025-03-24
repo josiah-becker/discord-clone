@@ -34,12 +34,15 @@ func HandleLogin(session *gocql.Session) http.HandlerFunc {
 			return
 		}
 
-		if loginRequest.Username == "" {
-			http.Error(w, "Username is required for authentication", http.StatusBadRequest)
-		} else if loginRequest.Password == "" {
-			http.Error(w, "Password is required for authentication", http.StatusBadRequest)
+		if loginRequest.Username == "" || loginRequest.Password == "" {
+			if(loginRequest.Username == "") {
+				http.Error(w, "Username is required for authentication", http.StatusBadRequest)
+			}
+			if(loginRequest.Password == "") {
+				http.Error(w, "Password is required for authentication", http.StatusBadRequest)
+			}
 			return
-		}
+		} 
 
 		valid, err := queries.AuthenticateUser(session, loginRequest.Username, loginRequest.Password)
 		if err != nil {
