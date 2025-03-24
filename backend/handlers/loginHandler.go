@@ -43,7 +43,7 @@ func HandleLogin(session *gocql.Session) http.HandlerFunc {
 
 		valid, err := queries.AuthenticateUser(session, loginRequest.Username, loginRequest.Password)
 		if err != nil {
-			http.Error(w, "Failed to authenticate user", http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(false)
 			return
 		}
 

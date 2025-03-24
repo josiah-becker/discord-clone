@@ -1,20 +1,32 @@
-import {
-  queryOptions,
-  useQueryClient,
-  useSuspenseQuery,
-} from '@tanstack/react-query'
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import clsx from 'clsx'
 import { useState } from 'react'
+import ArrowLeftRectangle from '../../../assets/ArrowLeftRectangle'
 import ArrowUpTray from '../../../assets/ArrowUpTray'
 import ChatBubble from '../../../assets/ChatBubble'
 import Menu from '../../../assets/Menu'
 import Search from '../../../assets/Search'
 import ResizeableElement from '../../../components/ResizeableElement'
+import { useAuth } from '../../../hooks/useAuth'
 
 export const Route = createFileRoute('/_protected/dashboard/')({
   component: RouteComponent,
 })
+
+const Users = [
+  {
+    username: 'User 1',
+    age: 20,
+  },
+  {
+    username: 'User 2',
+    age: 21,
+  },
+  {
+    username: 'User 3',
+    age: 22,
+  },
+]
 
 const MockServers = [
   {
@@ -35,20 +47,8 @@ const MockServers = [
 ]
 
 function RouteComponent() {
-  const { data: users } = useSuspenseQuery(
-    queryOptions({
-      queryKey: ['test'],
-      queryFn: async () => {
-        const res = await fetch('http://localhost:8080/api/users')
-        const jsonData = await res.json()
-        return jsonData
-      },
-    })
-  )
-
-  console.log('++ ', users)
-
-  const queryClient = useQueryClient()
+  const navigate = useNavigate()
+  const { logOut } = useAuth()
   const [showSidebar, setShowSidebar] = useState(true)
   return (
     <div className="h-full flex overflow-auto p-4">
@@ -65,7 +65,7 @@ function RouteComponent() {
             <div className="flex items-center justify-center min-w-16">
               <ChatBubble className="size-6" />
             </div>
-            {users.map(() => {
+            {Users.map(() => {
               return (
                 <div className="rounded-lg p-2 transition-colors hover:bg-[#35373d]">
                   <div className="size-16 min-w-16 p-2 rounded-full bg-[#25262B]">
@@ -91,31 +91,28 @@ function RouteComponent() {
         </div>
       )}
       <div className="flex flex-col gap-2 flex-1">
-        <header className="p-4 bg-[#1A191C] rounded-lg">
+        <header className="flex justify-between p-4 bg-[#1A191C] rounded-lg">
           <button
             className={clsx(
-              'text-[#B2B5C9] transition-opacity',
+              'text-[#B2B5C9] cursor-pointer rounded-lg p-2 transition-opacity hover:bg-[#35373d]',
               showSidebar && 'opacity-0 pointer-events-none'
             )}
             onClick={() => setShowSidebar((prev) => !prev)}
           >
-            <ArrowUpTray className="w-6 rotate-90 cursor-pointer" />
+            <ArrowUpTray className="w-6 rotate-90" />
+          </button>
+          <button
+            onClick={() => {
+              logOut()
+              navigate({ to: '/login' })
+            }}
+            className="flex gap-2 items-center cursor-pointer text-[#B2B5C9] rounded-lg p-2 hover:bg-[#35373d] transition-colors"
+          >
+            <span className="font-FunnelSans">Logout</span>
+            <ArrowLeftRectangle className="w-6 rotate-180" />
           </button>
         </header>
-        <div className="h-full min-w-96 gap-12 p-8 bg-[#25262B] rounded-lg flex">
-          <button
-            onClick={async () => {
-              await fetch('http://localhost:8080/api/user', {
-                method: 'POST',
-                body: JSON.stringify({ username: 'chaleme', age: 23 }),
-              })
-              queryClient.invalidateQueries({ queryKey: ['test'] })
-            }}
-            className="bg-[#1A1C1E] size-20 text-white/80"
-          >
-            Add user
-          </button>
-        </div>
+        <div className="h-full min-w-96 gap-12 p-8 bg-[#25262B] rounded-lg flex"></div>
       </div>
     </div>
   )
@@ -154,16 +151,6 @@ function SideBar({
 }: {
   setShowSidebar: React.Dispatch<React.SetStateAction<boolean>>
 }) {
-  const { data: users } = useSuspenseQuery(
-    queryOptions({
-      queryKey: ['test'],
-      queryFn: async () => {
-        const res = await fetch('http://localhost:8080/api/users')
-        const jsonData = await res.json()
-        return jsonData as { username: string; age: number }[]
-      },
-    })
-  )
   return (
     <ResizeableElement
       startingWidth={450}
@@ -192,7 +179,7 @@ function SideBar({
         </div>
 
         <div className="flex gap-4 text-xl flex-col">
-          {users.map(({ username, age }) => {
+          {Users.map(({ username, age }) => {
             return <DMRow username={username} age={age} />
           })}
         </div>
