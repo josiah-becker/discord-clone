@@ -10,7 +10,7 @@ import (
 )
 
 type LoginRequest struct {
-	Username string 
+	Username string
 	Password string
 }
 
@@ -26,7 +26,7 @@ func HandleLogin(session *gocql.Session) http.HandlerFunc {
 		defer r.Body.Close()
 
 		var loginRequest LoginRequest
-		
+
 		// Unmarshal the body into the user struct
 		err = json.Unmarshal(body, &loginRequest)
 		if err != nil {
@@ -38,7 +38,7 @@ func HandleLogin(session *gocql.Session) http.HandlerFunc {
 			http.Error(w, "Username is required for authentication", http.StatusBadRequest)
 			return
 		}
-		 if loginRequest.Password == "" {
+		if loginRequest.Password == "" {
 			http.Error(w, "Password is required for authentication", http.StatusBadRequest)
 			return
 		}

@@ -9,7 +9,7 @@ vet:
 
 clean:
 	go clean
-	rm -f ./hello_world
+	rm -f ./discord-server
 
 build: fmt vet
 	go build
