@@ -21,6 +21,7 @@ func createCassandraSession() *gocql.Session {
 
 	fmt.Println("Connected to Cassandra successfully!")
 
+	// Fix create table query
 	createTableQuery := `
 	CREATE TABLE IF NOT EXISTS users (
 		id UUID PRIMARY KEY,
