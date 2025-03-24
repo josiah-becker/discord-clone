@@ -21,12 +21,10 @@ func createCassandraSession() *gocql.Session {
 
 	fmt.Println("Connected to Cassandra successfully!")
 
-	// Fix create table query
 	createTableQuery := `
 	CREATE TABLE IF NOT EXISTS users (
-		id UUID PRIMARY KEY,
-		username TEXT,
-		age INT
+		username TEXT PRIMARY KEY,
+		password TEXT
 	);`
 
 	createErr := session.Query(createTableQuery).Exec()
