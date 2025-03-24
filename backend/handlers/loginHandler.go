@@ -36,7 +36,9 @@ func HandleLogin(session *gocql.Session) http.HandlerFunc {
 
 		if loginRequest.Username == "" {
 			http.Error(w, "Username is required for authentication", http.StatusBadRequest)
-		} else if loginRequest.Password == "" {
+			return
+		}
+		 if loginRequest.Password == "" {
 			http.Error(w, "Password is required for authentication", http.StatusBadRequest)
 			return
 		}
